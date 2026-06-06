@@ -5,7 +5,7 @@ export const siteConfig = {
   intro:
     "I am a Computer Science student at CUNY Brooklyn College passionate about full-stack software engineering, building modern web applications, and creating polished user-focused digital experiences.",
   about:
-    "I am a Computer Science student at CUNY Brooklyn College focused on full-stack software engineering. Through CUNY Tech Prep, Girls Who Code, and hands-on software projects, I've developed experience building web applications using React, TypeScript, Node.js, Express, FastAPI, and MongoDB. I enjoy taking ideas from concept to reality by building applications that are both polished for users and functional behind the scenes.",
+    "I am a Computer Science student at CUNY Brooklyn College focused on full-stack software engineering. Through CUNY Tech Prep, academic coursework, and hands-on software projects, I've developed experience building web applications using React, TypeScript, Node.js, Express, FastAPI, and MongoDB. I enjoy taking ideas from concept to reality by building applications that are both polished for users and functional behind the scenes.",
   email: "ileanatemer@gmail.com",
   location: "New York, NY",
   resumePath: "/resume.pdf",
@@ -108,32 +108,5 @@ export const education = [
       "Discrete Structures",
       "C++",
     ],
-  },
-] as const;
-
-export const projects = [
-  {
-    title: "Intervue",
-    description:
-      "AI-powered mock interview platform that simulates realistic technical and behavioral interviews with adaptive questioning and personalized performance feedback.",
-    tags: ["TypeScript", "React", "FastAPI", "MongoDB"],
-    github: "https://github.com/justinyc1/intervue",
-    demo: "https://www.intervue.org/",
-  },
-  {
-    title: "ReviewRadar",
-    description:
-      "Full-stack review platform featuring a dynamic rating system, polished responsive UI, and collaborative development.",
-    tags: ["TypeScript", "React", "Node.js", "Express.js", "MongoDB"],
-    github: "https://github.com/ileanat/ReviewRadar",
-    demo: "https://reviewradar-1.onrender.com/",
-  },
-  {
-    title: "MarketHub",
-    description:
-      "E-commerce demo with hoverable category filtering, product generation API, and interactive search functionality.",
-    tags: ["HTML", "CSS", "JavaScript", "Node.js", "Express"],
-    github: null,
-    demo: null,
   },
 ] as const;
