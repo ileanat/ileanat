@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackendStatusBadge } from "@/components/BackendStatusBadge";
 import { LocationExplorer } from "@/components/LocationExplorer";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -27,6 +28,7 @@ export default async function LocationExplorerPage({
             label="Explore"
             title="Location Explorer"
             description="Search for locations, businesses, and points of interest through an interactive map experience powered by Google Maps and a Java Spring Boot backend."
+            badge={<BackendStatusBadge />}
           />
           <LocationExplorer initialPlace={place} />
         </div>
