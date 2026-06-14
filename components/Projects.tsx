@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { projects as localProjects } from "@/lib/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-
-const PROJECTS_API_URL = "http://localhost:8080/api/projects";
 
 type Project = {
   title: string;
@@ -12,6 +11,20 @@ type Project = {
   github: string | null;
   demo: string | null;
 };
+
+function toProjects(
+  items: typeof localProjects,
+): Project[] {
+  return items.map((project) => ({
+    title: project.title,
+    description: project.description,
+    tags: [...project.tags],
+    github: project.github,
+    demo: project.demo,
+  }));
+}
+
+const fallbackProjects = toProjects(localProjects);
 
 const projectAccents = [
   "from-[#E8AEB7]/30 via-accent/10 to-card",
@@ -108,37 +121,55 @@ function ProjectCardSkeleton() {
   );
 }
 
+async function fetchBackendProjects(backendUrl: string): Promise<Project[]> {
+  const response = await fetch(`${backendUrl}/api/projects`);
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  const data: Project[] = await response.json();
+
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error("Backend returned no projects.");
+  }
+
+  return data;
+}
+
 export function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProjects = useCallback(async () => {
+  const loadProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
 
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
     try {
-      const response = await fetch(PROJECTS_API_URL);
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+      if (backendUrl) {
+        const backendProjects = await fetchBackendProjects(backendUrl);
+        setProjects(backendProjects);
+        return;
       }
-
-      const data: Project[] = await response.json();
-      setProjects(data);
     } catch {
-      setProjects([]);
-      setError(
-        "Unable to load projects. Make sure the backend is running on port 8080.",
-      );
-    } finally {
-      setLoading(false);
+      // Fall back to local project data below.
     }
+
+    if (fallbackProjects.length > 0) {
+      setProjects(fallbackProjects);
+      return;
+    }
+
+    setProjects([]);
+    setError("Unable to load projects.");
   }, []);
 
   useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+    void loadProjects();
+  }, [loadProjects]);
 
   return (
     <section id="projects" className="border-t border-border/60 py-24">
@@ -162,7 +193,7 @@ export function Projects() {
             <p className="text-sm text-muted">{error}</p>
             <button
               type="button"
-              onClick={fetchProjects}
+              onClick={() => void loadProjects()}
               className="mt-4 text-sm font-medium text-accent transition-colors hover:text-foreground"
             >
               Try again →

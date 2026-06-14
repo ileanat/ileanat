@@ -111,3 +111,30 @@ export const education = [
     ],
   },
 ] as const;
+
+export const projects = [
+  {
+    title: "Intervue",
+    description:
+      "AI-powered mock interview platform that simulates realistic technical and behavioral interviews with adaptive questioning and personalized performance feedback.",
+    tags: ["TypeScript", "React", "FastAPI", "MongoDB"],
+    github: "https://github.com/justinyc1/intervue",
+    demo: "https://www.intervue.org/",
+  },
+  {
+    title: "ReviewRadar",
+    description:
+      "Full-stack review platform featuring a dynamic rating system, polished responsive UI, and collaborative development.",
+    tags: ["TypeScript", "React", "Node.js", "Express.js", "MongoDB"],
+    github: "https://github.com/ileanat/ReviewRadar",
+    demo: "https://reviewradar-1.onrender.com/",
+  },
+  {
+    title: "MarketHub",
+    description:
+      "E-commerce demo with hoverable category filtering, product generation API, and interactive search functionality.",
+    tags: ["HTML", "CSS", "JavaScript", "Node.js", "Express"],
+    github: null,
+    demo: null,
+  },
+] as const;
