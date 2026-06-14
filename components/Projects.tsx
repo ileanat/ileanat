@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { projects as localProjects } from "@/lib/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -12,9 +12,7 @@ type Project = {
   demo: string | null;
 };
 
-function toProjects(
-  items: typeof localProjects,
-): Project[] {
+function toProjects(items: typeof localProjects): Project[] {
   return items.map((project) => ({
     title: project.title,
     description: project.description,
@@ -24,7 +22,33 @@ function toProjects(
   }));
 }
 
-const fallbackProjects = toProjects(localProjects);
+const defaultProjects = toProjects(localProjects);
+
+function isValidProject(value: unknown): value is Project {
+  if (!value || typeof value !== "object") return false;
+
+  const project = value as Record<string, unknown>;
+
+  return (
+    typeof project.title === "string" &&
+    project.title.length > 0 &&
+    typeof project.description === "string" &&
+    project.description.length > 0 &&
+    Array.isArray(project.tags) &&
+    project.tags.length > 0 &&
+    project.tags.every((tag) => typeof tag === "string") &&
+    (project.github === null || typeof project.github === "string") &&
+    (project.demo === null || typeof project.demo === "string")
+  );
+}
+
+function isValidProjectList(value: unknown): value is Project[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((project) => isValidProject(project))
+  );
+}
 
 const projectAccents = [
   "from-[#E8AEB7]/30 via-accent/10 to-card",
@@ -121,55 +145,64 @@ function ProjectCardSkeleton() {
   );
 }
 
-async function fetchBackendProjects(backendUrl: string): Promise<Project[]> {
-  const response = await fetch(`${backendUrl}/api/projects`);
-
-  if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
-  }
-
-  const data: Project[] = await response.json();
-
-  if (!Array.isArray(data) || data.length === 0) {
-    throw new Error("Backend returned no projects.");
-  }
-
-  return data;
-}
-
 export function Projects() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  const hasLocalProjects = defaultProjects.length > 0;
+  const [projects, setProjects] = useState<Project[]>(defaultProjects);
+  const [loading, setLoading] = useState(!hasLocalProjects);
   const [error, setError] = useState<string | null>(null);
 
-  const loadProjects = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
+  useEffect(() => {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-    try {
-      if (backendUrl) {
-        const backendProjects = await fetchBackendProjects(backendUrl);
-        setProjects(backendProjects);
-        return;
+    if (!backendUrl) {
+      if (!hasLocalProjects) {
+        setLoading(false);
+        setError("Unable to load projects.");
       }
-    } catch {
-      // Fall back to local project data below.
-    }
-
-    if (fallbackProjects.length > 0) {
-      setProjects(fallbackProjects);
       return;
     }
 
-    setProjects([]);
-    setError("Unable to load projects.");
-  }, []);
+    const controller = new AbortController();
 
-  useEffect(() => {
-    void loadProjects();
-  }, [loadProjects]);
+    async function syncFromBackend() {
+      try {
+        const response = await fetch(`${backendUrl}/api/projects`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          if (!hasLocalProjects) {
+            setError("Unable to load projects.");
+          }
+          return;
+        }
+
+        const data: unknown = await response.json();
+
+        if (isValidProjectList(data)) {
+          setProjects(data);
+          setError(null);
+        } else if (!hasLocalProjects) {
+          setError("Unable to load projects.");
+        }
+      } catch {
+        if (!controller.signal.aborted && !hasLocalProjects) {
+          setError("Unable to load projects.");
+        }
+      } finally {
+        if (!controller.signal.aborted && !hasLocalProjects) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void syncFromBackend();
+
+    return () => controller.abort();
+  }, [hasLocalProjects]);
+
+  const showSkeleton = loading && projects.length === 0;
+  const showError = !showSkeleton && error && projects.length === 0;
 
   return (
     <section id="projects" className="border-t border-border/60 py-24">
@@ -180,7 +213,7 @@ export function Projects() {
           description="Full-stack applications and demos built through coursework, fellowships, and collaborative development."
         />
 
-        {loading && (
+        {showSkeleton && (
           <div className="grid gap-6 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <ProjectCardSkeleton key={i} />
@@ -188,20 +221,13 @@ export function Projects() {
           </div>
         )}
 
-        {!loading && error && (
+        {showError && (
           <div className="rounded-xl border border-border bg-card p-8 text-center">
             <p className="text-sm text-muted">{error}</p>
-            <button
-              type="button"
-              onClick={() => void loadProjects()}
-              className="mt-4 text-sm font-medium text-accent transition-colors hover:text-foreground"
-            >
-              Try again →
-            </button>
           </div>
         )}
 
-        {!loading && !error && (
+        {!showSkeleton && !showError && (
           <div className="grid gap-6 lg:grid-cols-3">
             {projects.map((project, index) => (
               <ProjectCard key={project.title} project={project} index={index} />
