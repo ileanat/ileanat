@@ -4,12 +4,54 @@ import { FormEvent, useState } from "react";
 import { siteConfig } from "@/lib/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
+const CONTACT_API_URL = "http://localhost:8080/api/contact";
+
 export function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError(null);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(CONTACT_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          message: formData.get("message"),
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ??
+            "Unable to send your message. Make sure the backend is running on port 8080.",
+        );
+      }
+
+      form.reset();
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to send your message. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -20,7 +62,7 @@ export function Contact() {
             <SectionHeading
               label="Contact"
               title="Let's connect"
-              description="Have a project in mind or want to chat? Send me a message — I'll get back to you as soon as I can."
+              description="Have a project in mind or want to chat? Send me a message and I'll get back to you as soon as I can."
             />
             <div className="mt-8 space-y-4 text-muted">
               <p className="flex items-center gap-3">
@@ -139,12 +181,15 @@ export function Contact() {
                 </div>
                 <h3 className="text-lg font-medium">Message sent!</h3>
                 <p className="mt-2 text-sm text-muted">
-                  Thanks for reaching out. This is a frontend-only demo — wire up
-                  a backend to deliver messages for real.
+                  Thanks for reaching out. I&apos;ll get back to you as soon as I
+                  can.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    setSubmitted(false);
+                    setError(null);
+                  }}
                   className="mt-6 text-sm text-accent transition-colors hover:text-accent-hover"
                 >
                   Send another message
@@ -164,8 +209,9 @@ export function Contact() {
                     name="name"
                     type="text"
                     required
+                    disabled={submitting}
                     placeholder="Your name"
-                    className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent"
+                    className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
                   />
                 </div>
                 <div>
@@ -180,8 +226,9 @@ export function Contact() {
                     name="email"
                     type="email"
                     required
+                    disabled={submitting}
                     placeholder="you@example.com"
-                    className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent"
+                    className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
                   />
                 </div>
                 <div>
@@ -196,15 +243,22 @@ export function Contact() {
                     name="message"
                     required
                     rows={5}
+                    disabled={submitting}
                     placeholder="Tell me about your project..."
-                    className="w-full resize-none rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent"
+                    className="w-full resize-none rounded-lg border border-border bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-60"
                   />
                 </div>
+                {error && (
+                  <p className="rounded-lg border border-border bg-background px-4 py-3 text-sm text-muted">
+                    {error}
+                  </p>
+                )}
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-accent px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/25"
+                  disabled={submitting}
+                  className="w-full rounded-xl bg-accent px-6 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-accent-hover hover:shadow-lg hover:shadow-accent/25 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Send Message
+                  {submitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             )}

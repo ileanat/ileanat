@@ -21,6 +21,7 @@ export const navLinks = [
   { label: "Resume", href: "#resume" },
   { label: "Projects", href: "#projects" },
   { label: "Contact", href: "#contact" },
+  { label: "Location Explorer", href: "/map-demo" },
 ] as const;
 
 export const skillCategories = [
@@ -61,7 +62,7 @@ export const experience = [
   {
     role: "Club Connector",
     company: "Girls Who Code College Loop",
-    period: "January 2026 — Present",
+    period: "January 2026 — June 2026",
     highlights: [
       "Facilitated 15+ technical workshops",
       "Supported an inclusive learning community for 100+ women and non-binary students",
@@ -72,7 +73,7 @@ export const experience = [
   {
     role: "Software Engineering Fellow",
     company: "CUNY Tech Prep",
-    period: "July 2025 — Present",
+    period: "Jul 2025 – Jun 2026",
     highlights: [
       "Built full-stack applications using React, Node.js, Express, and MongoDB",
       "Applied modern software engineering best practices",
@@ -95,9 +96,9 @@ export const education = [
   {
     school: "CUNY Brooklyn College",
     degree: "Bachelor of Science in Computer Science",
-    period: "Graduating May 2026",
+    period: "Graduated May 2026",
     gpa: "3.4/4.0",
-    honors: ["Dean's List (3x)"],
+    honors: ["Dean's List (4x)"],
     coursework: [
       "Data Structures",
       "Algorithms",

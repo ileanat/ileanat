@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { education, experience, siteConfig } from "@/lib/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -77,7 +78,16 @@ export function Resume() {
                   <div className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-border transition-colors group-hover:bg-accent" />
                   <p className="font-mono text-xs text-muted">{item.period}</p>
                   <h4 className="mt-1 text-lg font-medium">{item.degree}</h4>
-                  <p className="text-sm text-accent">{item.school}</p>
+                  {item.school === "CUNY Brooklyn College" ? (
+                    <Link
+                      href="/map-demo?place=brooklyn-college"
+                      className="text-sm text-accent transition-colors hover:text-accent-hover"
+                    >
+                      {item.school}
+                    </Link>
+                  ) : (
+                    <p className="text-sm text-accent">{item.school}</p>
+                  )}
                   <p className="mt-2 text-sm text-muted">GPA: {item.gpa}</p>
                   <p className="mt-1 text-sm text-muted">
                     {item.honors.join(" · ")}

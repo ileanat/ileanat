@@ -5,3 +5,5 @@ target/
 .project
 .settings/
 *.log
+.env.local
+.env
