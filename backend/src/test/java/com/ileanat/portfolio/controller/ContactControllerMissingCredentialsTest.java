@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 @TestPropertySource(properties = {
         "spring.mail.host=smtp.gmail.com",
-        "spring.mail.port=587",
+        "spring.mail.port=465",
         "spring.mail.username=",
         "spring.mail.password=",
         "contact.recipient=ileanatemer@gmail.com"

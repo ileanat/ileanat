@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({MailTestService.class, MailTestControllerFailureTest.FailureConfig.class})
 @TestPropertySource(properties = {
         "spring.mail.host=smtp.gmail.com",
-        "spring.mail.port=587",
+        "spring.mail.port=465",
         "spring.mail.username=test@example.com",
         "spring.mail.password=test-password"
 })
