@@ -2,6 +2,8 @@ package com.ileanat.portfolio.service;
 
 import com.ileanat.portfolio.exception.ContactDeliveryException;
 import com.ileanat.portfolio.model.ContactRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ContactService {
+
+    private static final Logger log = LoggerFactory.getLogger(ContactService.class);
 
     private final JavaMailSender mailSender;
     private final String recipient;
@@ -27,6 +31,9 @@ public class ContactService {
     }
 
     public void sendMessage(ContactRequest request) {
+        log.info("mail username present: {}", !mailUsername.isBlank());
+        log.info("mail password present: {}", !mailPassword.isBlank());
+
         if (mailUsername.isBlank() || mailPassword.isBlank()) {
             throw new ContactDeliveryException(
                     "Email delivery is not configured. Set SPRING_MAIL_USERNAME and SPRING_MAIL_PASSWORD.");
@@ -47,6 +54,7 @@ public class ContactService {
 
             mailSender.send(message);
         } catch (Exception ex) {
+            log.error("Email send failed: {}", ex.getMessage());
             throw new ContactDeliveryException(
                     "Failed to send message. Check your Gmail SMTP credentials and try again.",
                     ex);
