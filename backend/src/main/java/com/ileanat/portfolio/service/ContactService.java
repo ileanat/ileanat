@@ -32,20 +32,36 @@ public class ContactService {
                     "Email delivery is not configured. Set SPRING_MAIL_USERNAME and SPRING_MAIL_PASSWORD.");
         }
 
+        if (recipient.isBlank()) {
+            throw new ContactDeliveryException(
+                    "Email delivery is not configured. Set CONTACT_RECIPIENT.");
+        }
+
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(mailUsername);
             message.setTo(recipient);
             message.setReplyTo(request.email());
             message.setSubject("Portfolio contact from " + request.name());
-            message.setText(
-                    "Name: " + request.name() + "\n"
-                            + "Email: " + request.email() + "\n\n"
-                            + request.message());
+            message.setText(buildEmailBody(request));
 
             mailSender.send(message);
         } catch (Exception ex) {
-            throw new ContactDeliveryException("Failed to send message. Please try again later.", ex);
+            throw new ContactDeliveryException(
+                    "Failed to send message. Check your Gmail SMTP credentials and try again.",
+                    ex);
         }
+    }
+
+    private String buildEmailBody(ContactRequest request) {
+        return """
+                New portfolio contact form submission
+
+                Name: %s
+                Email: %s
+
+                Message:
+                %s
+                """.formatted(request.name(), request.email(), request.message());
     }
 }

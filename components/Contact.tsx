@@ -4,8 +4,6 @@ import { FormEvent, useState } from "react";
 import { siteConfig } from "@/lib/site";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
-const CONTACT_API_URL = "http://localhost:8080/api/contact";
-
 export function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -16,11 +14,21 @@ export function Contact() {
     setSubmitting(true);
     setError(null);
 
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    if (!backendUrl) {
+      setError(
+        "Unable to send your message right now. Please email me directly and I'll get back to you soon.",
+      );
+      setSubmitting(false);
+      return;
+    }
+
     const form = e.currentTarget;
     const formData = new FormData(form);
 
     try {
-      const response = await fetch(CONTACT_API_URL, {
+      const response = await fetch(`${backendUrl}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +45,13 @@ export function Contact() {
       if (!response.ok) {
         throw new Error(
           data?.error ??
-            "Unable to send your message. Make sure the backend is running on port 8080.",
+            "Unable to send your message right now. Please try again in a moment.",
+        );
+      }
+
+      if (!data?.message) {
+        throw new Error(
+          "Unable to send your message right now. Please try again in a moment.",
         );
       }
 
@@ -47,7 +61,7 @@ export function Contact() {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to send your message. Please try again.",
+          : "Unable to send your message right now. Please try again in a moment.",
       );
     } finally {
       setSubmitting(false);
