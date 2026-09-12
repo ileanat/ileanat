@@ -52,7 +52,7 @@ export const experience = [
   {
     role: "Peer Tutor",
     company: "Brooklyn College SEEK",
-    period: "March 2026 — Present",
+    period: "March 2026 — August 2026",
     highlights: [
       "Provide individualized tutoring to students in Microsoft Office (Word, Excel, PowerPoint)",
       "Assist with assignments, projects, documents, spreadsheets, and presentations",
