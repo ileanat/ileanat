@@ -8,6 +8,9 @@ import {
   LocationResult,
   searchPlacesNearBrooklynCollege,
 } from "@/lib/location";
+import { LocationAccessRequestForm } from "@/components/LocationAccessRequestForm";
+
+const LOCATION_ACCESS_REQUEST_ENABLED = false;
 
 const ACCENT = "#e8aeb7";
 const ACCENT_HOVER = "#f0bec6";
@@ -284,6 +287,8 @@ export function LocationExplorer({ initialPlace }: LocationExplorerProps) {
       />
 
       <div className="space-y-8">
+        {LOCATION_ACCESS_REQUEST_ENABLED ? <LocationAccessRequestForm /> : null}
+
         <form
           onSubmit={handleSearch}
           className="rounded-2xl border border-border bg-card p-4 sm:p-6"

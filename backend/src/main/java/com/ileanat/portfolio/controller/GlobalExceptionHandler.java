@@ -1,6 +1,7 @@
 package com.ileanat.portfolio.controller;
 
 import com.ileanat.portfolio.exception.ContactDeliveryException;
+import com.ileanat.portfolio.exception.LocationAccessRequestException;
 import com.ileanat.portfolio.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +26,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleContactDelivery(ContactDeliveryException ex) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(LocationAccessRequestException.class)
+    public ResponseEntity<ErrorResponse> handleLocationAccessRequest(LocationAccessRequestException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
     }
 }
